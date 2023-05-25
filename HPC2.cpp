@@ -5,80 +5,75 @@
 
 using namespace std;
 
-struct Treenode
-{
+struct TreeNode{
     int val;
-    Treenode* left;
-    Treenode* right;
-    Treenode(int x): val(x),left(NULL),right(NULL){}
+    TreeNode* left;
+    TreeNode* right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
 };
 
-void bfs(Treenode* root)
-{
-    queue<Treenode*> q;
+void pBFS(TreeNode* root){
+    queue<TreeNode*> q;
     q.push(root);
-    while(!q.empty())
-    {
-        int qs=q.size();
+    while(!q.empty()){
+        int qs = q.size();
         #pragma omp parallel for
-        for(int i=0;i<qs;i++)
-        {
-            Treenode* node;
+        for(int i = 0; i < qs; i++){
+            TreeNode* node;
             #pragma omp critical
             {
-                node=q.front();
-                cout<<node->val;
+                node = q.front();
+                cout << node->val << " ";
                 q.pop();
-                if(node->left)q.push(node->left);
-                if(node->right)q.push(node->right);
-
+                if(node->left) q.push(node->left);
+                if(node->right) q.push(node->right);
             }
         }
     }
 }
 
-void dfs(Treenode* root)
-{
-    stack<Treenode*> s;
+void pDFS(TreeNode* root){
+    stack<TreeNode*> s;
     s.push(root);
-    while(!s.empty())
-    {
-        int qs=s.size();
-        #pragma omp parallel for 
-        for(int i=0;i<qs;i++)
-        {
-            Treenode* node;
+    while(!s.empty()){
+        int ss = s.size();
+        #pragma omp parallel for
+        for(int i = 0; i < ss; i++){
+            TreeNode* node;
             #pragma omp critical
             {
-                node=s.top();
-                cout<<node->val;
+                node = s.top();
+                cout << node->val << " ";
                 s.pop();
-                if(node->right)s.push(node->right);
-                if(node->left)s.push(node->left);
+                if(node->right) s.push(node->right);
+                if(node->left) s.push(node->left);
             }
         }
     }
-
 }
 
 
+int main(){
+    // Construct Tree
+    TreeNode* tree = new TreeNode(1);
+    tree->left = new TreeNode(2);
+    tree->right = new TreeNode(3); 
+    tree->left->left = new TreeNode(4);
+    tree->left->right = new TreeNode(5);
+    tree->right->left = new TreeNode(6);
+    tree->right->right = new TreeNode(7);
 
-int main()
-{
-    Treenode* tree=new Treenode(1);
-    tree->left=new Treenode(2);
-    tree->right=new Treenode(3);
-    tree->left->left=new Treenode(4);
-    tree->left->right=new Treenode(5);
-    tree->right->left=new Treenode(6);
-    tree->right->right=new Treenode(7);
-    
+    /*
+    Our Tree Looks like this:
+                1
+            2       3
+        4     5   6    7
+        
+    */
 
-    cout<<"Parallel BFS";
-    pbfs(tree);
-    cout<<endl<<"Parallel DFS";
-    pdfs(tree);
-    return 0;
-
-
+    cout << "Parallel BFS: ";
+    pBFS(tree);
+    cout << "\n";
+    cout << "Parallel DFS: ";
+    pDFS(tree);
 }
